@@ -1,49 +1,48 @@
 require("dotenv").config();
 const express = require("express");
 const session = require("express-session");
-const passport = require("./auth/googleAuth.js");
+const passport = require("./auth/googleAuth.js"); // Ensure your auth setup is correct
 const cors = require("cors");
 const { exec } = require("child_process");
 
 const app = express();
+app.use(express.json()); // ✅ Parse JSON requests
 
-// Enable CORS for frontend development
+// ✅ Enable CORS for frontend communication
 app.use(cors({
-  origin: "http://localhost:5173", // Make sure this matches your frontend URL
-  credentials: true, // Allow cookies to be sent
+  origin: "http://localhost:5173",
+  credentials: true,
+  methods: ["GET"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
-// Middleware for sessions
+// ✅ Middleware for sessions
 app.use(
   session({
-    secret: "your_secret_key",
+    secret: process.env.SESSION_SECRET || "your_secret_key",
     resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false }, // Set `true` if using HTTPS
+    saveUninitialized: false,
+    cookie: { secure: false, httpOnly: true, sameSite: "lax" },
   })
 );
 
-// Initialize Passport
+// ✅ Initialize Passport for authentication
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Google OAuth Routes
-app.get("/api/auth/google", (req, res, next) => {
-  console.log("Google login route triggered");
-  passport.authenticate("google", { scope: ["profile", "email"] })(req, res, next);
-});
+// ✅ Google OAuth Routes
+app.get("/api/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
 
 app.get(
   "/auth/google/callback",
-  passport.authenticate("google", {
-    failureRedirect: "/login",
-  }),
+  passport.authenticate("google", { failureRedirect: "/login" }),
   (req, res) => {
-    res.redirect("http://localhost:5173/dashboard"); // Redirect to frontend after login
+    console.log("✅ User authenticated:", req.user);
+    res.redirect("http://localhost:5173/dashboard");
   }
 );
 
-// Check if user is logged in
+// ✅ Check if user is logged in
 app.get("/api/auth/user", (req, res) => {
   if (req.isAuthenticated()) {
     res.json({ user: req.user });
@@ -52,24 +51,32 @@ app.get("/api/auth/user", (req, res) => {
   }
 });
 
-// Logout route
-app.get("/logout", (req, res) => {
+// ✅ Logout route
+app.get("/api/logout", (req, res) => {
   req.logout((err) => {
-    if (err) return next(err);
+    if (err) return res.status(500).json({ error: "Logout failed" });
     res.redirect("/");
   });
 });
 
-console.log("Google Client ID:", process.env.GOOGLE_CLIENT_ID);
-console.log("Google Client Secret:", process.env.GOOGLE_CLIENT_SECRET);
+// ✅ Protect API Routes (Ensure User is Logged In)
+const ensureAuthenticated = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  return res.status(401).json({ error: "Unauthorized: Please log in" });
+};
 
-// API to select directory (Windows/MacOS)
-app.get("/api/select-directory", (req, res) => {
+// ✅ API to select a directory (Returns full path using old GUI)
+app.get("/api/select-directory", ensureAuthenticated, (req, res) => {
   let command;
+
   if (process.platform === "win32") {
+    // ✅ Windows: Use PowerShell's Folder Picker
     command =
       'powershell -command "Add-Type -AssemblyName System.Windows.Forms; $f=New-Object System.Windows.Forms.FolderBrowserDialog; $f.ShowDialog(); $f.SelectedPath"';
   } else {
+    // ✅ macOS: Use AppleScript's Folder Picker
     command =
       `osascript -e 'tell application "System Events" to return POSIX path of (choose folder as alias)'`;
   }
@@ -80,14 +87,12 @@ app.get("/api/select-directory", (req, res) => {
       return res.status(500).json({ error: "Failed to select directory" });
     }
 
-    // ✅ Remove "OK\r\n" and trim whitespace
-    const cleanedPath = stdout.replace(/^OK\r?\n/, "").trim();
-
-    console.log("📁 Cleaned Selected Directory Path:", cleanedPath); // Debugging output
+    const cleanedPath = stdout.trim(); // ✅ Clean up the full path
+    console.log("📁 Selected Directory Path:", cleanedPath);
     res.json({ path: cleanedPath });
   });
 });
 
-// Start server
+// ✅ Start backend
 const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

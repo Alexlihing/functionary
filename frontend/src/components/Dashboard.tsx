@@ -4,6 +4,8 @@ import DirectorySelector from './DirectorySelector'; // Import the DirectorySele
 import './Dashboard.css';
 
 const Dashboard = () => {
+  console.log("Dashboard Component Loaded"); // Debugging log
+
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Dashboard Header */}
@@ -22,16 +24,8 @@ const Dashboard = () => {
       <section className="py-20 px-4">
         <div className="max-w-3xl mx-auto">
           <Card className="border-2 border-dashed border-slate-300">
-            <CardHeader>
-              <CardTitle className="text-2xl text-center">Select Your Project Directory</CardTitle>
-              <CardDescription className="text-center">
-                Choose the root folder of your project to analyze its structure
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
               {/* Use the DirectorySelector component here */}
               <DirectorySelector />
-            </CardContent>
           </Card>
         </div>
       </section>

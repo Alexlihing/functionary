@@ -1,24 +1,34 @@
 import React, { useState } from "react";
-import { Upload } from "lucide-react"; // Assuming you use this icon
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card"; // Assuming you use ShadCN UI
+import { FolderOpen } from "lucide-react"; // Icon for clarity
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 
 const DirectorySelector: React.FC = () => {
   const [directoryPath, setDirectoryPath] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSelectDirectory = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/select-directory");
-      const data: { path?: string } = await response.json();
+      // Call the backend to open the OS-native folder picker
+      const response = await fetch("http://localhost:5001/api/select-directory", {
+        method: "GET",
+        credentials: "include", // Ensure session cookies are sent
+      });
 
-      console.log("📂 Full Path Received from Backend:", data.path); // ✅ Debugging output
-
-      if (data.path) {
-        setDirectoryPath(data.path); // ✅ Display full absolute path in UI
-      } else {
-        alert("No directory selected.");
+      if (!response.ok) {
+        throw new Error(`Server Error: ${response.statusText}`);
       }
-    } catch (error) {
+
+      const data = await response.json();
+      if (!data.path) {
+        throw new Error("No directory selected or selection was canceled.");
+      }
+
+      console.log("📂 Full Path Received from Backend:", data.path);
+      setDirectoryPath(data.path);
+      setError(null);
+    } catch (error: any) {
       console.error("❌ Error selecting directory:", error);
+      setError(error.message || "Failed to select directory. Please try again.");
     }
   };
 
@@ -27,12 +37,12 @@ const DirectorySelector: React.FC = () => {
       <CardHeader>
         <CardTitle className="text-2xl text-center">Select Your Project Directory</CardTitle>
         <CardDescription className="text-center">
-          Choose the root folder of your project to analyze its structure
+          Choose the root folder of your project to analyze its structure.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg">
-          <Upload className="w-12 h-12 text-gray-400 mb-4" />
+          <FolderOpen className="w-12 h-12 text-gray-400 mb-4" />
           <button
             onClick={handleSelectDirectory}
             className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
@@ -40,9 +50,13 @@ const DirectorySelector: React.FC = () => {
             Select Directory
           </button>
 
+          {error && (
+            <p className="mt-4 text-sm text-red-600 text-center">{error}</p>
+          )}
+
           {directoryPath && (
             <p className="mt-4 text-sm text-gray-700 text-center">
-              <strong>Selected Path:</strong> {directoryPath}
+              <strong>Full Path:</strong> {directoryPath}
             </p>
           )}
         </div>
