@@ -1,8 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Upload } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 
 const CodeAnalysisTool = () => {
+  const [directoryName, setDirectoryName] = useState('');
+
+  const handleDirectorySelection = async () => {
+    try {
+      // Open the directory picker
+      const dirHandle = await window.showDirectoryPicker();
+      setDirectoryName(dirHandle.name); // Set the directory name
+
+      // Here, you can send the directory handle to the backend
+      console.log("Selected Directory:", dirHandle.name);
+
+      // If backend needs the directory structure, iterate over it
+      for await (const entry of dirHandle.values()) {
+        console.log(entry.name, entry.kind); // Logs file/folder names inside the selected directory
+      }
+
+    } catch (error) {
+      console.error("Directory selection failed:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Landing Page Section */}
@@ -52,35 +73,32 @@ const CodeAnalysisTool = () => {
         </div>
       </section>
 
-      {/* Upload Section */}
+      {/* Directory Selection Section */}
       <section className="py-20 px-4 bg-white">
         <div className="max-w-3xl mx-auto">
           <Card className="border-2 border-dashed border-slate-300">
             <CardHeader>
-              <CardTitle className="text-2xl text-center">Upload Your Codebase</CardTitle>
+              <CardTitle className="text-2xl text-center">Select Your Project Directory</CardTitle>
               <CardDescription className="text-center">
-                Drag and drop your project files or click to browse
+                Choose the root folder of your project to analyze its structure
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col items-center justify-center p-12 bg-slate-50 rounded-lg">
                 <Upload className="w-16 h-16 text-slate-400 mb-4" />
-                <input
-                  type="file"
-                  id="file-upload"
-                  className="hidden"
-                  directory=""
-                  webkitdirectory=""
-                />
-                <label
-                  htmlFor="file-upload"
+                
+                <button
+                  onClick={handleDirectorySelection}
                   className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
                 >
-                  Select Files
-                </label>
-                <p className="mt-4 text-sm text-slate-500">
-                  Supported formats: .js, .jsx, .ts, .tsx, .py, .java
-                </p>
+                  Select Directory
+                </button>
+
+                {directoryName && (
+                  <p className="mt-4 text-sm text-slate-600">
+                    Selected Project: <strong>{directoryName}</strong>
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>
