@@ -1,11 +1,17 @@
-import { RouterProvider } from 'react-router-dom'
-import router from './components/router/routes'
-import './App.css'
+import { RouterProvider } from "react-router-dom";
+import router from "./components/router/routes";
+import DirectorySelector from "./components/DirectorySelector";
+import "./App.css";
 
 function App() {
   return (
-    <RouterProvider router={router} />
-  )
+    <div className="app-container">
+      <RouterProvider router={router} />
+      <div className="directory-selector-container">
+        <DirectorySelector />
+      </div>
+    </div>
+  );
 }
 
-export default App
+export default App;
