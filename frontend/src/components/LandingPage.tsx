@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Upload } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { useNavigate } from 'react-router-dom'; // Assuming you're using react-router-dom for navigation
 
 const CodeAnalysisTool = () => {
   const [directoryName, setDirectoryName] = useState('');
+  const navigate = useNavigate(); // Hook for navigation
 
   const handleDirectorySelection = async () => {
     try {
@@ -24,6 +26,10 @@ const CodeAnalysisTool = () => {
     }
   };
 
+  const handleVisualizeClick = () => {
+    navigate('/login'); // Navigate to the login page
+  };
+
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Landing Page Section */}
@@ -36,7 +42,15 @@ const CodeAnalysisTool = () => {
             Understand complex codebases instantly with AI-powered visualization and analysis
           </p>
           
-          <div className="grid md:grid-cols-3 gap-8 mb-16">
+          {/* Visualize Button */}
+          <button
+            onClick={handleVisualizeClick}
+            className="px-8 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer text-lg font-semibold"
+          >
+            Visualize Your Code
+          </button>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-16 mt-16">
             <Card>
               <CardHeader>
                 <CardTitle>Function Mapping</CardTitle>
@@ -73,7 +87,7 @@ const CodeAnalysisTool = () => {
         </div>
       </section>
 
-      {/* Directory Selection Section */}
+      {/* Directory Selection Section
       <section className="py-20 px-4 bg-white">
         <div className="max-w-3xl mx-auto">
           <Card className="border-2 border-dashed border-slate-300">
@@ -103,7 +117,7 @@ const CodeAnalysisTool = () => {
             </CardContent>
           </Card>
         </div>
-      </section>
+      </section> */}
     </div>
   );
 };

@@ -1,10 +1,9 @@
-import { RouterProvider } from "react-router-dom";
-import router from "./components/router/routes";  // Assuming your router is set up here
-import DirectorySelector from "./components/DirectorySelector";  // Your component
+import { RouterProvider, createBrowserRouter, Navigate } from "react-router-dom";
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import LandingPage from "./components/LandingPage";
 import LoginPage from "./components/LoginPage";
+import Dashboard from "./components/Dashboard"; // Assuming you have a Dashboard component
+import DirectorySelector from "./components/DirectorySelector"; // Your component
 import './App.css';
 
 const App: React.FC = () => {
@@ -35,41 +34,28 @@ const App: React.FC = () => {
     return <div>Loading...</div>; // Replace with a proper loading spinner
   }
 
+  // Define your routes using createBrowserRouter
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <LandingPage />, // Always show the landing page first
+    },
+    {
+      path: "/login",
+      element: <LoginPage />, // Login page
+    },
+    {
+      path: "/dashboard",
+      element: isAuthenticated ? <Dashboard /> : <Navigate to="/login" replace />, // Protected route
+    },
+  ]);
+
   return (
     <div className="app-container">
-      <Router>
-        {/* Handle routing */}
-        <Routes>
-          {/* Default route redirects to the login page if not authenticated */}
-          <Route 
-            path="/" 
-            element={
-              isAuthenticated ? <Navigate to="/home" replace /> : <Navigate to="/login" replace />
-            } 
-          />
-          
-          {/* Login page route */}
-          <Route path="/login" element={<LoginPage />} />
-          
-          {/* Home page route, protected by authentication */}
-          <Route 
-            path="/home" 
-            element={
-              isAuthenticated ? <LandingPage /> : <Navigate to="/login" replace />
-            } 
-          />
-        </Routes>
-      </Router>
-
-      {/* Directory Selector Component
-      <div className="directory-selector-container">
-        <DirectorySelector />
-      </div> */}
-
-      {/* RouterProvider Component */}
+      {/* Use RouterProvider for routing */}
       <RouterProvider router={router} />
     </div>
   );
-}
+};
 
 export default App;
