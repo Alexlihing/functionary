@@ -1,15 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from '../components/ui/card';
-import DirectorySelector from './DirectorySelector'; // Import the DirectorySelector component
+import DirectorySelector from './DirectorySelector';
+import Chatbot from './Visualizer'; // Import the Chatbot component
 import './Dashboard.css';
 
 const Dashboard = () => {
-  console.log("Dashboard Component Loaded"); // Debugging log
+  const [directorySelected, setDirectorySelected] = useState(false);
+
+  const handleDirectorySelect = () => {
+    setDirectorySelected(true);
+  };
+
+  const handleSendMessage = async (message: string) => {
+    // Replace with your actual backend API call
+    const response = await fetch('/api/chatbot', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ message }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch response from chatbot');
+    }
+
+    const data = await response.json();
+    return data.response;
+  };
 
   return (
-    <div className="min-h-screen w-full ">
+    <div className="min-h-screen w-full">
       {/* Dashboard Header */}
-      <section className="py-24 w-full bg-clear ">
+      <section className="py-24 w-full bg-clear">
         <div className="w-full text-center">
           <h1 className="text-4xl font-bold mb-4 text-slate-50">
             Welcome to Your Dashboard
@@ -21,16 +44,28 @@ const Dashboard = () => {
       </section>
 
       {/* Directory Selection Section */}
-      <section className="py-8 px-4 ">
+      <section className="py-8 px-4">
         <div className="max-w-3xl mx-auto bg-clear">
           <Card className="border-2 border-transparent bg-clear">
             <CardContent>
-              {/* Use the DirectorySelector component here */}
-              <DirectorySelector />
+              <DirectorySelector onDirectorySelect={handleDirectorySelect} />
             </CardContent>
           </Card>
         </div>
       </section>
+
+      {/* Chatbot Section */}
+      {directorySelected && (
+        <section className="py-8 px-4">
+          <div className="max-w-3xl mx-auto bg-clear">
+            <Card className="border-2 border-transparent bg-clear">
+              <CardContent>
+                <Chatbot onSendMessage={handleSendMessage} />
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+      )}
     </div>
   );
 };

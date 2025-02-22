@@ -3,45 +3,41 @@ import React, { useEffect, useState } from "react";
 import LandingPage from "./components/LandingPage";
 import LoginPage from "./components/LoginPage";
 import Dashboard from "./components/Dashboard";
-import DirectorySelector from "./components/DirectorySelector"; // Import DirectorySelector if needed
+import Visualizer from "./components/Visualizer"; // Import the Visualizer page
 import "./App.css";
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // ✅ Check authentication status on component mount
   useEffect(() => {
     fetch("http://localhost:5001/api/auth/user", { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {
-        console.log("Auth API Response:", data); // Debugging log
-
+        console.log("Auth API Response:", data);
         if (data?.user) {
-          setIsAuthenticated(true); // ✅ User is authenticated
+          setIsAuthenticated(true);
         } else {
-          setIsAuthenticated(false); // ❌ User is not authenticated
+          setIsAuthenticated(false);
         }
       })
       .catch((err) => {
         console.error("❌ Error checking authentication:", err);
-        setIsAuthenticated(false); // Assume not authenticated on error
+        setIsAuthenticated(false);
       })
       .finally(() => {
-        setIsLoading(false); // ✅ Set loading to false after the check
+        setIsLoading(false);
       });
   }, []);
 
-  // ✅ Show a loading screen until authentication check completes
   if (isLoading) {
     return (
       <div className="loading-screen">
         <h2>Loading...</h2>
       </div>
-    ); // Replace with a proper loading spinner if needed
+    );
   }
 
-  // ✅ Define routes using createBrowserRouter
   const router = createBrowserRouter([
     {
       path: "/",
@@ -55,11 +51,14 @@ const App: React.FC = () => {
       path: "/dashboard",
       element: isAuthenticated ? <Dashboard /> : <Navigate to="/login" replace />,
     },
+    {
+      path: "/visualizer",
+      element: isAuthenticated ? <Visualizer /> : <Navigate to="/login" replace />,
+    },
   ]);
 
   return (
     <div className="app-container">
-      {/* ✅ Use RouterProvider for proper routing */}
       <RouterProvider router={router} />
     </div>
   );
