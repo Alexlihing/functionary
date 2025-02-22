@@ -4,6 +4,8 @@ import DirectorySelector from './DirectorySelector'; // Import the DirectorySele
 import './Dashboard.css';
 
 const Dashboard = () => {
+  console.log("Dashboard Component Loaded"); // Debugging log
+
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Dashboard Header */}
