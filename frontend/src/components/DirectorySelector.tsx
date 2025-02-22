@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FolderOpen } from "lucide-react"; // ✅ Icon for clarity
+import { FolderOpen } from "lucide-react"; // Icon for clarity
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 
 const DirectorySelector: React.FC = () => {
@@ -8,10 +8,10 @@ const DirectorySelector: React.FC = () => {
 
   const handleSelectDirectory = async () => {
     try {
-      // ✅ Call the backend to open the OS-native folder picker
+      // Call the backend to open the OS-native folder picker
       const response = await fetch("http://localhost:5001/api/select-directory", {
         method: "GET",
-        credentials: "include", // ✅ Ensure session cookies are sent
+        credentials: "include", // Ensure session cookies are sent
       });
 
       if (!response.ok) {
@@ -20,7 +20,7 @@ const DirectorySelector: React.FC = () => {
 
       const data = await response.json();
       if (!data.path) {
-        throw new Error("No directory selected.");
+        throw new Error("No directory selected or selection was canceled.");
       }
 
       console.log("📂 Full Path Received from Backend:", data.path);
@@ -28,7 +28,7 @@ const DirectorySelector: React.FC = () => {
       setError(null);
     } catch (error: any) {
       console.error("❌ Error selecting directory:", error);
-      setError(error.message || "An unexpected error occurred.");
+      setError(error.message || "Failed to select directory. Please try again.");
     }
   };
 
