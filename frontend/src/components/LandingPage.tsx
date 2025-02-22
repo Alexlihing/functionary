@@ -1,71 +1,93 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Upload } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 
-const LandingPage = () => {
-  const navigate = useNavigate();
-
+const CodeAnalysisTool = () => {
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <header className="header fixed w-full top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center">
-            <h1 className="text-2xl font-bold text-gradient">CodeVision</h1>
-          </div>
-          <button
-            onClick={() => navigate('/login')}
-            className="btn-primary focus-ring"
-          >
-            Login
-          </button>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="pt-24">
-        <section className="py-20 px-4">
-          <div className="max-w-5xl mx-auto text-center animate-fade-in">
-            <h1 className="hero-title mb-6">
-              Code Visualization Made Simple
-            </h1>
-            <p className="hero-subtitle text-slate-600">
-              Understand complex codebases instantly with AI-powered visualization and analysis
-            </p>
-            
-            <div className="grid grid-auto-fit mt-16">
-              <div className="feature-card">
-                <h3 className="text-xl font-semibold mb-4">Function Mapping</h3>
+      {/* Landing Page Section */}
+      <section className="py-20 px-4">
+        <div className="max-w-5xl mx-auto text-center">
+          <h1 className="text-5xl font-bold mb-6 text-slate-900">
+            Code Visualization Made Simple
+          </h1>
+          <p className="text-xl text-slate-600 mb-12">
+            Understand complex codebases instantly with AI-powered visualization and analysis
+          </p>
+          
+          <div className="grid md:grid-cols-3 gap-8 mb-16">
+            <Card>
+              <CardHeader>
+                <CardTitle>Function Mapping</CardTitle>
+              </CardHeader>
+              <CardContent>
                 <p className="text-slate-600">
                   Visualize relationships between functions and trace code flow through your entire codebase
                 </p>
-              </div>
+              </CardContent>
+            </Card>
 
-              <div className="feature-card">
-                <h3 className="text-xl font-semibold mb-4">AI Context</h3>
+            <Card>
+              <CardHeader>
+                <CardTitle>AI Context</CardTitle>
+              </CardHeader>
+              <CardContent>
                 <p className="text-slate-600">
                   Get intelligent explanations of code functionality powered by advanced language models
                 </p>
-              </div>
+              </CardContent>
+            </Card>
 
-              <div className="feature-card">
-                <h3 className="text-xl font-semibold mb-4">Quick Onboarding</h3>
+            <Card>
+              <CardHeader>
+                <CardTitle>Quick Onboarding</CardTitle>
+              </CardHeader>
+              <CardContent>
                 <p className="text-slate-600">
                   Help new team members understand your codebase structure and patterns rapidly
                 </p>
-              </div>
-            </div>
-
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="btn-primary mt-16 focus-ring"
-            >
-              Get Started
-            </button>
+              </CardContent>
+            </Card>
           </div>
-        </section>
-      </main>
+        </div>
+      </section>
+
+      {/* Upload Section */}
+      <section className="py-20 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <Card className="border-2 border-dashed border-slate-300">
+            <CardHeader>
+              <CardTitle className="text-2xl text-center">Upload Your Codebase</CardTitle>
+              <CardDescription className="text-center">
+                Drag and drop your project files or click to browse
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col items-center justify-center p-12 bg-slate-50 rounded-lg">
+                <Upload className="w-16 h-16 text-slate-400 mb-4" />
+                <input
+                  type="file"
+                  id="file-upload"
+                  className="hidden"
+                  directory=""
+                  webkitdirectory=""
+                />
+                <label
+                  htmlFor="file-upload"
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
+                >
+                  Select Files
+                </label>
+                <p className="mt-4 text-sm text-slate-500">
+                  Supported formats: .js, .jsx, .ts, .tsx, .py, .java
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
     </div>
   );
 };
 
-export default LandingPage;
+export default CodeAnalysisTool;
