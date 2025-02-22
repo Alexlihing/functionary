@@ -1,58 +1,65 @@
 import { RouterProvider, createBrowserRouter, Navigate } from "react-router-dom";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import LandingPage from "./components/LandingPage";
 import LoginPage from "./components/LoginPage";
-import Dashboard from "./components/Dashboard"; // Assuming you have a Dashboard component
-import DirectorySelector from "./components/DirectorySelector"; // Your component
-import './App.css';
+import Dashboard from "./components/Dashboard";
+import DirectorySelector from "./components/DirectorySelector"; // Import DirectorySelector if needed
+import "./App.css";
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Check authentication status on component mount
+  // ✅ Check authentication status on component mount
   useEffect(() => {
-    fetch("http://localhost:5001/api/auth/google", { credentials: "include" })
+    fetch("http://localhost:5001/api/auth/user", { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {
+        console.log("Auth API Response:", data); // Debugging log
+
         if (data?.user) {
-          setIsAuthenticated(true); // User is authenticated
+          setIsAuthenticated(true); // ✅ User is authenticated
         } else {
-          setIsAuthenticated(false); // User is not authenticated
+          setIsAuthenticated(false); // ❌ User is not authenticated
         }
       })
       .catch((err) => {
-        console.error("Error checking authentication:", err);
+        console.error("❌ Error checking authentication:", err);
         setIsAuthenticated(false); // Assume not authenticated on error
       })
       .finally(() => {
-        setIsLoading(false); // Set loading to false after the check
+        setIsLoading(false); // ✅ Set loading to false after the check
       });
   }, []);
 
+  // ✅ Show a loading screen until authentication check completes
   if (isLoading) {
-    return <div>Loading...</div>; // Replace with a proper loading spinner
+    return (
+      <div className="loading-screen">
+        <h2>Loading...</h2>
+      </div>
+    ); // Replace with a proper loading spinner if needed
   }
 
-  // Define your routes using createBrowserRouter
+  // ✅ Define routes using createBrowserRouter
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <LandingPage />, // Always show the landing page first
+      element: <LandingPage />,
     },
     {
       path: "/login",
-      element: <LoginPage />, // Login page
+      element: <LoginPage />,
     },
     {
       path: "/dashboard",
-      element: isAuthenticated ? <Dashboard /> : <Navigate to="/login" replace />, // Protected route
+      element: isAuthenticated ? <Dashboard /> : <Navigate to="/login" replace />,
     },
   ]);
 
   return (
     <div className="app-container">
-      {/* Use RouterProvider for routing */}
+      {/* ✅ Use RouterProvider for proper routing */}
       <RouterProvider router={router} />
     </div>
   );

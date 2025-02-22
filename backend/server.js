@@ -9,17 +9,20 @@ const app = express();
 
 // Enable CORS for frontend development
 app.use(cors({
-  origin: "http://localhost:5173", // Make sure this matches your frontend URL
-  credentials: true, // Allow cookies to be sent
+  origin: "http://localhost:5173", // Ensure this matches your frontend URL
+  credentials: true, // Allow cookies & authentication headers
+  methods: ["GET", "POST", "PUT", "DELETE"], // Explicitly allow HTTP methods
+  allowedHeaders: ["Content-Type", "Authorization"], // Allow headers needed for auth
 }));
+
 
 // Middleware for sessions
 app.use(
   session({
-    secret: "your_secret_key",
+    secret: process.env.SESSION_SECRET || "your_secret_key",
     resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false }, // Set `true` if using HTTPS
+    saveUninitialized: false, // Prevent empty sessions
+    cookie: { secure: false, httpOnly: true, sameSite: "lax" }, // Secure cookies for authentication
   })
 );
 
@@ -35,13 +38,13 @@ app.get("/api/auth/google", (req, res, next) => {
 
 app.get(
   "/auth/google/callback",
-  passport.authenticate("google", {
-    failureRedirect: "/login",
-  }),
+  passport.authenticate("google", { failureRedirect: "/login" }),
   (req, res) => {
-    res.redirect("http://localhost:5173/dashboard"); // Redirect to frontend after login
+    console.log("✅ User authenticated:", req.user);
+    res.redirect("http://localhost:5173/dashboard"); // Redirect to frontend
   }
 );
+
 
 // Check if user is logged in
 app.get("/api/auth/user", (req, res) => {
