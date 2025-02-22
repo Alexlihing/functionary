@@ -24,10 +24,8 @@ const Dashboard = () => {
       <section className="py-20 px-4">
         <div className="max-w-3xl mx-auto">
           <Card className="border-2 border-dashed border-slate-300">
-            <CardContent>
               {/* Use the DirectorySelector component here */}
               <DirectorySelector />
-            </CardContent>
           </Card>
         </div>
       </section>
