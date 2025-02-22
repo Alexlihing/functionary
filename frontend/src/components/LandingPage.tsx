@@ -8,7 +8,7 @@ const CodeAnalysisTool = () => {
   const handleDirectorySelection = async () => {
     try {
       // Open the directory picker
-      const dirHandle = await window.showDirectoryPicker();
+      const dirHandle = await (window as any).showDirectoryPicker();
       setDirectoryName(dirHandle.name); // Set the directory name
 
       // Here, you can send the directory handle to the backend
