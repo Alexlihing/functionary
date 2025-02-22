@@ -13,12 +13,12 @@ const LoginPage: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    fetch("http://localhost:5001/api/auth/google", { credentials: "include" })
+    fetch("http://localhost:5001/api/auth/user", { credentials: "include" })
       .then((res) => res.json())
       .then((data: { user?: User }) => {
         if (data?.user) {
           setUser(data.user);
-          navigate("/"); // Redirect to homepage if logged in
+          navigate("/dashboard"); // Redirect to dashboard if logged in
         }
       })
       .catch((err) => console.error(err));

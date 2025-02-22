@@ -9,7 +9,7 @@ const app = express();
 
 // Enable CORS for frontend development
 app.use(cors({
-  origin: "http://localhost:3000", // Make sure this matches your frontend URL
+  origin: "http://localhost:5173", // Make sure this matches your frontend URL
   credentials: true, // Allow cookies to be sent
 }));
 
@@ -39,7 +39,7 @@ app.get(
     failureRedirect: "/login",
   }),
   (req, res) => {
-    res.redirect("http://localhost:3000"); // Redirect to frontend after login
+    res.redirect("http://localhost:5173/dashboard"); // Redirect to frontend after login
   }
 );
 
@@ -59,6 +59,9 @@ app.get("/logout", (req, res) => {
     res.redirect("/");
   });
 });
+
+console.log("Google Client ID:", process.env.GOOGLE_CLIENT_ID);
+console.log("Google Client Secret:", process.env.GOOGLE_CLIENT_SECRET);
 
 // API to select directory (Windows/MacOS)
 app.get("/api/select-directory", (req, res) => {
