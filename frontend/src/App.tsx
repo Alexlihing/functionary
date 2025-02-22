@@ -13,7 +13,7 @@ const App: React.FC = () => {
 
   // Check authentication status on component mount
   useEffect(() => {
-    fetch("/api/auth/user", { credentials: "include" })
+    fetch("http://localhost:5001/api/auth/google", { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {
         if (data?.user) {
@@ -61,10 +61,10 @@ const App: React.FC = () => {
         </Routes>
       </Router>
 
-      {/* Directory Selector Component */}
+      {/* Directory Selector Component
       <div className="directory-selector-container">
         <DirectorySelector />
-      </div>
+      </div> */}
 
       {/* RouterProvider Component */}
       <RouterProvider router={router} />

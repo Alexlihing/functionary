@@ -13,7 +13,7 @@ const LoginPage: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    fetch("/api/auth/user", { credentials: "include" })
+    fetch("http://localhost:5001/api/auth/google", { credentials: "include" })
       .then((res) => res.json())
       .then((data: { user?: User }) => {
         if (data?.user) {
