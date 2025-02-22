@@ -4,6 +4,7 @@ const cors = require("cors");
 const path = require("path");
 const users = require("./routes/users");
 const maps = require("./routes/maps");
+const RAG = require("../backend/routes/pinecone");
 
 const mongoose = require("mongoose");
 
@@ -17,6 +18,9 @@ mongoose
 
 app.use(cors());
 app.use(express.json());
+
+app.use(express.static(path.join(__dirname, "public")));
+app.use("/RAGservice", RAG);
 
 //add mongoose compass connection logic
 
