@@ -31,14 +31,14 @@ const CodeAnalysisTool = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen w-full bg-gradient-to-br from-[#09080f] to-[#7858d6]">
       {/* Landing Page Section */}
-      <section className="py-20 px-4">
-        <div className="max-w-5xl mx-auto text-center">
-          <h1 className="text-5xl font-bold mb-6 text-slate-900">
+      <section className="py-20">
+        <div className="w-full mx-auto text-center" id="123">
+          <h1 className="text-5xl font-bold mb-6 text-white">
             Code Visualization Made Simple
           </h1>
-          <p className="text-xl text-slate-600 mb-12">
+          <p className="text-xl text-slate-200 mb-12">
             Understand complex codebases instantly with AI-powered visualization and analysis
           </p>
           
@@ -46,39 +46,40 @@ const CodeAnalysisTool = () => {
           <button
             onClick={handleVisualizeClick}
             className="px-8 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer text-lg font-semibold"
+            id = "visualize-btn"
           >
             Visualize Your Code
           </button>
 
-          <div className="grid md:grid-cols-3 gap-8 mb-16 mt-16">
-            <Card>
+          <div className="grid md:grid-cols-3 gap-8 mb-16 mt-16 px-4">
+            <Card className="bg-white/10 backdrop-blur-md border border-slate-200/20">
               <CardHeader>
-                <CardTitle>Function Mapping</CardTitle>
+                <CardTitle className="text-white">Function Mapping</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-slate-600">
+                <p className="text-slate-200">
                   Visualize relationships between functions and trace code flow through your entire codebase
                 </p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-white/10 backdrop-blur-md border border-slate-200/20">
               <CardHeader>
-                <CardTitle>AI Context</CardTitle>
+                <CardTitle className="text-white">AI Context</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-slate-600">
+                <p className="text-slate-200">
                   Get intelligent explanations of code functionality powered by advanced language models
                 </p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-white/10 backdrop-blur-md border border-slate-200/20">
               <CardHeader>
-                <CardTitle>Quick Onboarding</CardTitle>
+                <CardTitle className="text-white">Quick Onboarding</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-slate-600">
+                <p className="text-slate-200">
                   Help new team members understand your codebase structure and patterns rapidly
                 </p>
               </CardContent>
@@ -86,38 +87,6 @@ const CodeAnalysisTool = () => {
           </div>
         </div>
       </section>
-
-      {/* Directory Selection Section
-      <section className="py-20 px-4 bg-white">
-        <div className="max-w-3xl mx-auto">
-          <Card className="border-2 border-dashed border-slate-300">
-            <CardHeader>
-              <CardTitle className="text-2xl text-center">Select Your Project Directory</CardTitle>
-              <CardDescription className="text-center">
-                Choose the root folder of your project to analyze its structure
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col items-center justify-center p-12 bg-slate-50 rounded-lg">
-                <Upload className="w-16 h-16 text-slate-400 mb-4" />
-                
-                <button
-                  onClick={handleDirectorySelection}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
-                >
-                  Select Directory
-                </button>
-
-                {directoryName && (
-                  <p className="mt-4 text-sm text-slate-600">
-                    Selected Project: <strong>{directoryName}</strong>
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section> */}
     </div>
   );
 };

@@ -1,145 +1,182 @@
 /* General resets / base styles (optional) */
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-  body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", 
-      Roboto, Helvetica, Arial, sans-serif;
-    color: #1a1a1a;
-    background: linear-gradient(to bottom right, #f0f4f8, #ffffff);
-    overflow-x: hidden;
-  }
-  
-  /* Overall container */
-  .landing-container {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-  
-  /* Header Styles */
-  .landing-header {
-    position: fixed;
-    width: 100%;
-    backdrop-filter: blur(10px);
-    background-color: rgba(255, 255, 255, 0.6);
-    z-index: 999;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-  }
-  .header-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 1rem 1.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .logo {
-    font-size: 1.6rem;
-    font-weight: 700;
-    letter-spacing: -1px;
-    color: #3f51b5; /* Purple-ish brand color */
-    cursor: default;
-  }
-  
-  /* Buttons */
-  .btn {
-    border: none;
-    outline: none;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 500;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
-    transition: background-color 0.2s ease, transform 0.2s ease;
-  }
-  .btn-login {
-    background-color: transparent;
-    color: #3f51b5;
-    border: 2px solid #3f51b5;
-  }
-  .btn-login:hover {
-    background-color: #3f51b5;
-    color: #fff;
-    transform: scale(1.03);
-  }
-  
-  .btn-primary {
-    background-color: #3f51b5;
-    color: #fff;
-  }
-  .btn-primary:hover {
-    background-color: #303f9f;
-    transform: scale(1.03);
-  }
-  
-  /* Main Content */
-  .main-content {
-    flex: 1;
-    padding-top: 70px; /* so content doesn't go behind fixed header */
-  }
-  
-  /* Hero Section */
-  .hero {
-    width: 100%;
-    text-align: center;
-    padding: 4rem 1rem 6rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .hero-text-box {
-    max-width: 800px;
-    margin: 0 auto;
-  }
-  .hero-title {
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: #0d0d0d;
-    line-height: 1.2;
-    margin-bottom: 1rem;
-  }
-  .hero-subtitle {
-    font-size: 1.2rem;
-    color: #555;
-    max-width: 700px;
-    margin: 0 auto 2.5rem;
-    line-height: 1.6;
-  }
-  
-  /* Features Grid */
-  .features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
-  }
-  .feature-card {
-    background-color: #fff;
-    border-radius: 0.75rem;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
-    padding: 2rem;
-    text-align: left;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-  .feature-card h3 {
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin-bottom: 0.75rem;
-  }
-  .feature-card p {
-    line-height: 1.5;
-    color: #666;
-  }
-  .feature-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.08);
-  }
-  
-  /* Utility classes if needed */
-  .mt-16 {
-    margin-top: 4rem;
-  }
-  
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", 
+    Roboto, Helvetica, Arial, sans-serif;
+  color: #1a1a1a;
+  background: linear-gradient(135deg, #09080f, #7858d6) !important;
+  overflow-x: hidden;
+  min-height: 100vh; /* Ensure full viewport height */
+}
+
+/* Overall container */
+.landing-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: transparent; /* Ensure no background color */
+}
+
+/* Header Styles */
+.landing-header {
+  position: fixed;
+  width: 100%;
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.6);
+  z-index: 999;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+#123 {
+  background: linear-gradient(135deg, #09080f, #7858d6) !important;
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -1px;
+  color: #3f51b5; /* Purple-ish brand color */
+  cursor: default;
+}
+
+/* Buttons */
+.btn {
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-login {
+  background-color: transparent;
+  color: #3f51b5;
+  border: 2px solid #3f51b5;
+}
+
+.btn-login:hover {
+  background-color: #3f51b5;
+  color: #fff;
+  transform: scale(1.03);
+}
+
+.btn-primary {
+  background-color: #3f51b5;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: #303f9f;
+  transform: scale(1.03);
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  padding-top: 70px; /* So content doesn't go behind fixed header */
+  background: transparent; /* Ensure no background color */
+}
+
+/* Hero Section */
+.hero {
+  width: 100%;
+  text-align: center;
+  padding: 4rem 1rem 6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent; /* Ensure no background color */
+}
+
+.hero-text-box {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #0d0d0d;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+  font-size: 1.2rem;
+  color: #555;
+  max-width: 700px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.6;
+}
+
+/* Features Grid */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+#visualize-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  background: #7955dc;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+  width: 100%;
+}
+
+.feature-card {
+  background-color: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+  padding: 2rem;
+  text-align: left;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.feature-card h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.feature-card p {
+  line-height: 1.5;
+  color: #666;
+}
+
+.feature-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* Utility classes if needed */
+.mt-16 {
+  margin-top: 4rem;
+}
