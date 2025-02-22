@@ -33,7 +33,7 @@ const DirectorySelector: React.FC = () => {
   };
 
   return (
-    <Card className="border-2 border-dashed border-gray-300">
+    <Card className="border-2 border-dashed bg-slate-50 border-gray-300">
       <CardHeader>
         <CardTitle className="text-2xl text-center">Select Your Project Directory</CardTitle>
         <CardDescription className="text-center">
