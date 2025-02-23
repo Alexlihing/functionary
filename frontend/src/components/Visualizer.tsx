@@ -1,40 +1,64 @@
-import React, { useState } from 'react';
-import Chatbot from './Chatbot'; // Correct import for the Chatbot component
-import './Visualizer.css'; // Import the CSS for this page
+import React, { useState } from "react";
+import Chatbot from "./Chatbot"; // Correct import for the Chatbot component
+import "./Visualizer.css"; // Import the CSS for this page
+import FunctionMap from "./functionMap";
 
 const Visualizer = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleSendMessage = async (message: string) => {
-    // TODO: Replace with actual backend API call for the chatbot
-    const response = await fetch('/api/chatbot', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ message }),
-    });
+    try {
+      const response = await fetch(
+        "http://localhost:5001/RAGservice/GenExplain",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ query: message }),
+        }
+      );
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch response from chatbot');
+      if (!response.ok) {
+        throw new Error("Failed to fetch response from chatbot");
+      }
+
+      const data = await response.json();
+      console.log("Raw API Response:", data);
+
+      // Extract the actual JSON from "completion" string
+      if (data.completion) {
+        const match = data.completion.match(/```json\n([\s\S]*?)\n```/);
+        if (match) {
+          const extractedJson = JSON.parse(match[1]); // Convert to valid JSON
+          console.log("Parsed JSON:", extractedJson);
+          return extractedJson;
+        }
+      }
+
+      throw new Error("Invalid response format");
+    } catch (error) {
+      console.error("Error fetching chatbot response:", error);
+      return {
+        summary: "Error",
+        detailedExplanation: "Failed to fetch data.",
+        codeSnippets: [],
+      };
     }
-
-    const data = await response.json();
-    return data.response;
   };
 
   const handleSearch = async () => {
     // TODO: Replace with actual backend API call for the search function
-    const response = await fetch('/api/search', {
-      method: 'POST',
+    const response = await fetch("/api/search", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ query: searchQuery }),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch search results');
+      throw new Error("Failed to fetch search results");
     }
 
     const data = await response.json();
@@ -46,7 +70,7 @@ const Visualizer = () => {
       {/* Main Content Area */}
       <div className="main-content">
         {/* Placeholder for the main content */}
-        <h1>Insert Code Visualizer Here Somehow</h1>
+        <FunctionMap />
       </div>
 
       {/* Right Panel */}

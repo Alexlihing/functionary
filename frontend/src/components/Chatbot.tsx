@@ -1,24 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 interface ChatbotProps {
-  onSendMessage: (message: string) => Promise<string>; // Define the prop type
+  onSendMessage: (message: string) => Promise<string>;
+}
+
+interface ChatResponse {
+  summary: string;
+  detailedExplanation: string;
+  codeSnippets: { description: string; snippet: string }[];
 }
 
 const Chatbot: React.FC<ChatbotProps> = ({ onSendMessage }) => {
-  const [message, setMessage] = useState('');
-  const [response, setResponse] = useState('');
+  const [message, setMessage] = useState("");
+  const [response, setResponse] = useState();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSendMessage = async () => {
-    if (message.trim() === '') return;
+    if (message.trim() === "") return;
 
     setIsLoading(true);
     try {
       const botResponse = await onSendMessage(message);
-      setResponse(botResponse);
+      console.log("Raw Bot Response:", botResponse);
+
+      // Parse JSON response safely
+      const parsedResponse = botResponse;
+      setResponse(parsedResponse);
     } catch (error) {
-      console.error('Error sending message:', error);
-      setResponse('Failed to get a response from the chatbot.');
+      console.error("Error parsing response:", error);
+      setResponse(null);
     } finally {
       setIsLoading(false);
     }
@@ -26,11 +36,33 @@ const Chatbot: React.FC<ChatbotProps> = ({ onSendMessage }) => {
 
   return (
     <div className="chatbot-container">
-      
-
       {/* Chatbot Messages */}
       <div className="chatbot-messages">
-        {response && <div className="chatbot-response">{response}</div>}
+        {response && (
+          <div className="chatbot-response">
+            <h3>Summary</h3>
+            <p>{response.summary}</p>
+
+            <h3>Detailed Explanation</h3>
+            <p>{response.detailedExplanation}</p>
+
+            {response.codeSnippets.length > 0 && (
+              <div>
+                <h3>Code Snippets</h3>
+                {response.codeSnippets.map((snippet, index) => (
+                  <div key={index} className="code-snippet">
+                    <p>
+                      <strong>{snippet.description}</strong>
+                    </p>
+                    <pre>
+                      <code>{snippet.snippet}</code>
+                    </pre>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Chatbot Input */}
@@ -43,7 +75,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ onSendMessage }) => {
           disabled={isLoading}
         />
         <button onClick={handleSendMessage} disabled={isLoading}>
-          {isLoading ? 'Sending...' : 'Send'}
+          {isLoading ? "Sending..." : "Send"}
         </button>
       </div>
     </div>

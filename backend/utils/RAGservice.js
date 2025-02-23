@@ -521,6 +521,85 @@ async function GPTExplain(functionName, context) {
   }
 }
 
+async function generalizedExplain(query) {
+  try {
+    const startTime = Date.now();
+    logger.info(`Generating detailed explanation for: ${query}`);
+
+    // Retrieve relevant context from Pinecone
+    const context = await queryPinecone(query, 10);
+
+    // Extract and format context content
+    const contextContent = context
+      .map((chunk) => chunk.content)
+      .join("\n\n")
+      .substring(0, 3000); // Limit to 3000 characters to avoid token limits
+
+    const prompt = {
+      model: "gpt-4-turbo",
+      messages: [
+        {
+          role: "system",
+          content: `You are a senior software engineer explaining code to a developer. Always respond in JSON format:
+            \`\`\`json
+            {
+              "summary": "Brief explanation",
+              "detailedExplanation": "In-depth analysis",
+              "codeSnippets": [
+                {
+                  "description": "What the snippet does",
+                  "snippet": "Actual code snippet"
+                }
+              ]
+            }
+            \`\`\`
+            No extra text—just valid JSON.`,
+        },
+        {
+          role: "user",
+          content: `**User Question**:
+                ${query}
+        
+                **Relevant Code Context**:
+                ${contextContent}
+        
+                **Your Explanation**:`,
+        },
+      ],
+      temperature: 0.3,
+      max_tokens: 1000,
+    };
+
+    const response = await axios.post(
+      "https://api.openai.com/v1/chat/completions",
+      prompt,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        timeout: 30000, // 30 seconds timeout
+      }
+    );
+
+    if (!response.data?.choices?.[0]?.message?.content) {
+      throw new Error("Invalid response structure from OpenAI API");
+    }
+
+    const explanation = response.data.choices[0].message.content;
+    logger.info(
+      `Generated explanation in ${Date.now() - startTime}ms (tokens: ${
+        response.data.usage?.total_tokens || "unknown"
+      })`
+    );
+
+    return explanation;
+  } catch (error) {
+    logger.error("GPTExplain failed:", error.response?.data || error.message);
+    throw new Error(`Failed to generate explanation: ${error.message}`);
+  }
+}
+
 module.exports = {
   FileString,
   FunctionDef,
@@ -530,4 +609,5 @@ module.exports = {
   sendtoLLM,
   explain,
   GPTExplain,
+  generalizedExplain,
 };
