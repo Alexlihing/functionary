@@ -1,27 +1,50 @@
 import React, { useState } from "react";
-import { FolderOpen } from "lucide-react"; // Icon for clarity
+import { FolderOpen } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { useNavigate } from "react-router-dom";
 
 const DirectorySelector: React.FC = () => {
   const [directoryPath, setDirectoryPath] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  const handleDirectorySelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDirectorySelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) {
       setError("No directory selected or selection was canceled.");
       return;
     }
 
-    setSelectedFiles(files);
-    setDirectoryPath(files[0]?.webkitRelativePath.split("/")[0] || "Unknown Directory");
     setError(null);
+    setDirectoryPath(files[0]?.webkitRelativePath.split("/")[0] || "Unknown Directory");
 
-    // Call dirAnalysis function
-    dirAnalysis(Array.from(files));
+    // Convert files into a structured array
+    const fileList = Array.from(files).map((file) => ({
+      name: file.name,
+      path: file.webkitRelativePath,
+      size: file.size,
+      type: file.type,
+    }));
+
+    try {
+      setIsUploading(true);
+      const response = await fetch("http://localhost:5000/api/dirAnalysis", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ directory: directoryPath, files: fileList }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to analyze directory.");
+      }
+
+      console.log("Directory analysis completed!");
+    } catch (error) {
+      setError("Error analyzing directory: " + (error as Error).message);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleGoToVisualizer = () => {
@@ -55,7 +78,7 @@ const DirectorySelector: React.FC = () => {
             htmlFor="directoryInput"
             className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer mb-4"
           >
-            Select Directory
+            {isUploading ? "Analyzing..." : "Select Directory"}
           </label>
 
           {error && <p className="mt-4 text-sm text-red-600 text-center">{error}</p>}
@@ -66,7 +89,6 @@ const DirectorySelector: React.FC = () => {
             </p>
           )}
 
-          {/* Button to navigate to the Visualizer page */}
           <button
             onClick={handleGoToVisualizer}
             disabled={!directoryPath}

@@ -1,60 +1,165 @@
-/* CodeAnalysisPage.css */
-.code-analysis-container {
+/* Visualizer.css */
+.visualizer-container {
     display: flex;
     height: 100vh;
     width: 100vw;
-    background-color: #f9fafb;
-  }
-  
-  .main-content {
+    background: linear-gradient(135deg, #09080f, #7858d6) !important; /* Updated gradient background */
+}
+
+/* Main Content Area */
+.main-content {
     flex: 2; /* Takes up 2/3 of the screen */
     padding: 2rem;
-    background-color: #ffffff;
+    background-color: #1b1919;
     overflow-y: auto; /* Allow scrolling for main content */
-  }
-  
-  .search-bar {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 33.33%; /* Takes up 1/3 of the screen */
-    height: 100vh;
-    padding: 1rem;
-    background-color: #f3f4f6;
-    border-left: 1px solid #e5e7eb;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 1.5rem;
+    border-radius: 12px; /* Rounded corners for the main content */
+}
+
+.main-content h1 {
+    font-size: 2rem;
+    color: #ffffff; /* White text for better contrast */
+    margin-bottom: 1rem;
+}
+
+/* Right Panel */
+.right-panel {
+    flex: 1; /* Takes up 1/3 of the screen */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin: 1.5rem;
+}
+
+/* Search Panel */
+.search-panel {
+    padding: 1.5rem;
+    background: linear-gradient(to bottom, #8b5cf6, #6d28d9); /* Vertical gradient: lighter purple at top to darker purple at bottom */
+    border-radius: 12px; /* Rounded corners */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: white; /* White text */
+    height: 30%; /* About 1/3 the height of the chatbot panel */
     display: flex;
     flex-direction: column;
     gap: 1rem;
-  }
-  
-  .search-bar input {
-    width: 100%;
+}
+
+.search-panel h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* Subtle divider */
+}
+
+.search-input {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.search-input input {
+    flex: 1;
     padding: 0.5rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 4px;
-  }
-  
-  .search-bar button {
+    border: none;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.2); /* Slightly transparent white background */
+    color: white;
+}
+
+.search-input input::placeholder {
+    color: rgba(255, 255, 255, 0.7); /* Light placeholder text */
+}
+
+.search-input button {
     padding: 0.5rem 1rem;
-    background-color: #3b82f6;
+    background-color: #895fed; /* Lighter purple for the button */
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
-  }
-  
-  .search-bar button:hover {
-    background-color: #2563eb;
-  }
-  
-  .chatbot-panel {
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    width: 33.33%; /* Same width as the search bar */
-    height: 50vh; /* Takes up half of the right panel */
-    padding: 1rem;
-    background-color: #ffffff;
-    border-left: 1px solid #e5e7eb;
-    box-shadow: -2px 0 4px rgba(0, 0, 0, 0.1);
-  }
+    transition: background-color 0.2s;
+}
+
+.search-input button:hover {
+    background-color: #754dd2; /* Darker purple on hover */
+}
+
+/* Chatbot Panel */
+.chatbot-panel {
+    flex: 1; /* Takes up remaining space */
+    padding: 1.5rem;
+    background: linear-gradient(to bottom, #8b5cf6, #6d28d9); /* Vertical gradient: lighter purple at top to darker purple at bottom */
+    border-radius: 12px; /* Rounded corners */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: white; /* White text */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Chatbot Styling */
+.chatbot-panel .chatbot {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.chatbot-panel .chatbot-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.1); /* Slightly transparent white background */
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.chatbot-panel .chatbot-input {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.chatbot-panel .chatbot-input input {
+    flex: 1;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.2); /* Slightly transparent white background */
+    color: white;
+}
+
+.chatbot-panel .chatbot-input input::placeholder {
+    color: rgba(255, 255, 255, 0.7); /* Light placeholder text */
+}
+
+.chatbot-panel .chatbot-input button {
+    padding: 0.5rem 1rem;
+    background-color: #895fed; /* Lighter purple for the button */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.chatbot-panel .chatbot-input button:hover {
+    background-color: #754dd2; /* Darker purple on hover */
+}
+
+/* Chatbot Header */
+.chatbot-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.chatbot-header h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: white;
+    margin: 0;
+    padding: 0.4rem;
+    background-color: rgba(0, 0, 0, 0.15); /* Slightly transparent black background */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

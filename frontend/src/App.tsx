@@ -53,7 +53,8 @@ const App: React.FC = () => {
     },
     {
       path: "/visualizer",
-      element: isAuthenticated ? <Visualizer /> : <Navigate to="/login" replace />,
+      element: <Visualizer />,
+      errorElement: <div>Something went wrong. Please try again.</div>, // Add error handling
     },
   ]);
 
