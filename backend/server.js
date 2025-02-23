@@ -4,6 +4,7 @@ const passport = require("./auth/googleAuth.js"); // Ensure your auth setup is c
 const cors = require("cors");
 const { exec } = require("child_process");
 const RAG = require("../backend/routes/pinecone");
+const { dirAnalysis } = require("./utils/dirAnalysis.js");
 require("dotenv").config();
 
 const app = express();
