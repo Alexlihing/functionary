@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import CodeDiagram from "./CodeDiagram";
 
+
 import { FileString } from "./CodeDiagram";
+import { useLocation } from "react-router-dom";
 
 // [Same mockFileStrings data as before - keeping it unchanged]
 const mockFileStrings = [
@@ -566,6 +568,8 @@ const mockFileStrings = [
 
 const FunctionMap = () => {
   const [fileStrings, setFileStrings] = useState<FileString[]>([]);
+  const location = useLocation();
+  const { files } = location.state;
 
   const explain = async (functionName: string) => {
     try {
@@ -592,7 +596,7 @@ const FunctionMap = () => {
 
   useEffect(() => {
     setTimeout(() => {
-      setFileStrings(mockFileStrings);
+      setFileStrings(files);
       try {
         fetch("http://localhost:5001/RAGservice/embedCode", {
           method: "POST",
@@ -600,7 +604,7 @@ const FunctionMap = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            fileStrings: mockFileStrings,
+            fileStrings: files,
           }),
         });
       } catch (error) {

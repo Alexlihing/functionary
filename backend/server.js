@@ -109,6 +109,7 @@ app.post("/api/dirAnalysis", (req, res) => {
   if (!fileStrings) {
     return res.status(400).json({ error: "No files found for analysis" });
   }
+  console.log("📁 File strings: ", fileStrings);
   res.json({ message: `Directory ${files} analyzed successfully!`, files: fileStrings });
 });
 

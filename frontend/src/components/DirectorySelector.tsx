@@ -67,19 +67,25 @@ const DirectorySelector: React.FC = () => {
         })
       );
 
-      fileList.forEach((file) => {
-        console.log("Content of file:", file.name, file.content);
-        const directoryName = file.path.split("/")[0];
-        if (excludedDirs.has(directoryName) || !(file.name.endsWith(".js") || file.name.endsWith(".jsx") || file.name.endsWith(".ts") || file.name.endsWith(".tsx"))) {
-          fileList.splice(fileList.indexOf(file), 1);
-        }
+      const filteredFiles = fileList.filter((file) => {
+        var excludeCheck = file.path.split("/").filter(function(dir) {
+          console.log(excludedDirs)
+          console.log(file.path)
+          console.log("tf?", excludedDirs.has(dir))
+          return excludedDirs.has(dir);
+        });
+        return excludeCheck.length === 0 && (file.name.endsWith(".js") || file.name.endsWith(".jsx") || file.name.endsWith(".ts") || file.name.endsWith(".tsx"));
+      });
+
+      filteredFiles.forEach((file) => {
+        console.log(file.path);
       });
 
       setIsUploading(true);
       const response = await fetch("http://localhost:5001/api/dirAnalysis", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ directory: directoryPath, files: fileList }),
+        body: JSON.stringify({ directory: directoryPath, files: filteredFiles }),
       });
 
       const responseData = await response.json();
@@ -100,6 +106,8 @@ const DirectorySelector: React.FC = () => {
   };
 
   const readGitignore = (content: string) => {
+    
+
     const lines = content.split("\n");
 
     lines.forEach((line) => {

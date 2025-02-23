@@ -155,10 +155,10 @@ const findCalls = (node, filePath, parentFunc = null) => {
 };
 
 export function dirAnalysis(files) {
+  fileStrings = [];
   files.forEach((file) => {
     parseJsFile(file);
   });
-  fileStrings = [];
   //console.log("Function Definitions:", functionDefs);
   //console.log("Function Calls:", functionCalls);
   //console.log("File Strings:", fileStrings);
