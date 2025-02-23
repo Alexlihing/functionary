@@ -1,6 +1,10 @@
 {
   "dependencies": {
+    "@babel/generator": "^7.26.9",
+    "@babel/parser": "^7.26.9",
+    "acorn": "^8.14.0",
     "cors": "^2.8.5",
+    "dependencies": "^0.0.1",
     "dotenv": "^16.4.7",
     "escodegen": "^2.1.0",
     "express": "^4.21.2",
@@ -12,8 +16,11 @@
     "react-router-dom": "^6.29.0"
   },
   "devDependencies": {
+    "@types/escodegen": "^0.0.10",
+    "acorn-jsx": "^5.3.2",
     "autoprefixer": "^10.4.14",
     "postcss": "^8.4.21",
-    "tailwindcss": "^3.3.1"
+    "tailwindcss": "^3.3.1",
+    "vite": "^6.1.1"
   }
 }

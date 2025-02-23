@@ -1,5 +1,5 @@
-import { parse } from "acorn";
-import escodegen from "escodegen";
+import * as BabelParser from "@babel/parser";
+import * as BabelGenerator from "@babel/generator";
 
 const excludedDirs = new Set<string>([".git"]);
 const fileStrings: FileString[] = [];
@@ -84,10 +84,13 @@ const parseJsFile = (file: File, filePath: string): void => {
     if (event.target?.result) {
       const fileContent = event.target.result as string;
       try {
-        const ast = parse(fileContent, { ecmaVersion: "latest" });
+        console.log("Parsing JS file: ", filePath);
+        const ast = BabelParser.parse(fileContent, { sourceType: "module", plugins: ["jsx", "typescript"] });
+        console.log("Successful parse: ", filePath);
         findFunctions(ast, filePath);
         findCalls(ast, filePath);
         fileStrings.push(new FileString(filePath, fileContent, functionDefs, functionCalls));
+        console.log("File String: ", fileStrings);
         functionDefs = [];
         functionCalls = [];
         console.log("File Strings: ", fileStrings);
@@ -135,8 +138,8 @@ const findFunctions = (node: any, filePath: string): void => {
   }
 
   if (nodeName) {
-    const params = nodeParams?.map((param) => escodegen.generate(param)) || [];
-    const code = escodegen.generate(node);
+    const params = nodeParams?.map((param) => BabelGenerator.default(param).code) || [];
+    const code = BabelGenerator.default(node).code;
     functionDefs.push(new FunctionDef(filePath, nodeName, params, code));
   }
 
@@ -180,7 +183,7 @@ const findCalls = (node: any, filePath: string, parentFunc: string | null = null
   }
 
   if (node.type === "CallExpression" && node.callee.name) {
-    const args = node.arguments.map((arg: any) => escodegen.generate(arg));
+    const args = node.arguments.map((arg: any) => BabelGenerator.default(arg).code);
     functionCalls.push(new FunctionCall(filePath, parentFunc, node.callee.name, args));
   }
 

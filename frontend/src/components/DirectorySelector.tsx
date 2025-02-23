@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { FolderOpen } from "lucide-react"; // Icon for clarity
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { dirAnalysis } from "./dirAnalysis"; // Import dirAnalysis
 
 const DirectorySelector: React.FC = () => {
   const [directoryPath, setDirectoryPath] = useState<string | null>(null);

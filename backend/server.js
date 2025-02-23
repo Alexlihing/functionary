@@ -4,6 +4,7 @@ const session = require("express-session");
 const passport = require("./auth/googleAuth.js"); // Ensure your auth setup is correct
 const cors = require("cors");
 const { exec } = require("child_process");
+const { dirAnalysis } = require("./utils/dirAnalysis.js");
 
 const app = express();
 app.use(express.json()); // ✅ Parse JSON requests
@@ -91,6 +92,15 @@ app.get("/api/select-directory", ensureAuthenticated, (req, res) => {
     console.log("📁 Selected Directory Path:", cleanedPath);
     res.json({ path: cleanedPath });
   });
+});
+
+app.get("/api/dirAnalysis", ensureAuthenticated, (req, res) => {
+  const files = req.query.files;
+  console.log("📁 Directory Path for Analysis:", files);
+  
+  dirAnalysis(files);
+
+  res.json({ message: `Directory ${dirPath} analyzed successfully!` });
 });
 
 // ✅ Start backend
