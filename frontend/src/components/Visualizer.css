@@ -110,7 +110,7 @@
 .chatbot-panel .chatbot-messages {
   flex: 1;
   overflow-y: auto;
-  max-height: 300px;
+  max-height: 480px;
   padding: 0.5rem;
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 8px;

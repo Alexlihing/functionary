@@ -4,7 +4,6 @@ import "./Visualizer.css"; // Import the CSS for this page
 import FunctionMap from "./functionMap";
 
 const Visualizer = () => {
-  const [searchQuery, setSearchQuery] = useState("");
 
   const handleSendMessage = async (message: string) => {
     try {
@@ -47,23 +46,6 @@ const Visualizer = () => {
     }
   };
 
-  const handleSearch = async () => {
-    // TODO: Replace with actual backend API call for the search function
-    const response = await fetch("/api/search", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ query: searchQuery }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch search results");
-    }
-
-    const data = await response.json();
-    console.log(data); // Handle search results as needed
-  };
 
   return (
     <div className="visualizer-container">
@@ -75,19 +57,7 @@ const Visualizer = () => {
 
       {/* Right Panel */}
       <div className="right-panel">
-        {/* Search Panel */}
-        <div className="search-panel">
-          <h3>Search Function</h3>
-          <div className="search-input">
-            <input
-              type="text"
-              placeholder="Enter search query..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <button onClick={handleSearch}>Search</button>
-          </div>
-        </div>
+        
 
         {/* Chatbot Panel */}
         <div className="chatbot-panel">
