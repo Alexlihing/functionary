@@ -1,5 +1,6 @@
 import { parse } from "@babel/parser";
 import generate from "@babel/generator"; // Fixed import
+import { dirAnalyzedRepo } from "../repo/dirAnalyzedRepo.js";
 
 const fileStrings = [];
 let functionDefs = [];
@@ -38,18 +39,19 @@ const parseJsFile = (file) => {
       console.error("Invalid content in file: ", file.path);
       return;
     }    
-    console.log("Parsing JS file: ", file.path);
+    //console.log("Parsing JS file: ", file.path);
     const ast = parse(file.content, { 
       sourceType: "module", 
       plugins: ["jsx", "typescript"] 
     });
-    console.log("Successful parse: ", file.path);
+    //console.log("Successful parse: ", file.path);
     findFunctions(ast, file.path);
     findCalls(ast, file.path);
     fileStrings.push(new FileString(file.path, file.content, functionDefs, functionCalls));
     functionDefs = [];
     functionCalls = [];
     console.log("File strings: ", fileStrings);
+    dirAnalyzedRepo(fileStrings);
   } catch (error) {
     console.error("Error parsing JS file: ", file.path, "\n", error);
   }
