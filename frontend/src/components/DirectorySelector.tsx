@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../co
 import { useNavigate } from "react-router-dom";
 
 const DirectorySelector: React.FC = () => {
-  const excludedDirs = new Set([".git"]);
   const [directoryPath, setDirectoryPath] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -19,7 +18,6 @@ const DirectorySelector: React.FC = () => {
     }
 
     setError(null);
-    setDirectoryPath(files[0]?.webkitRelativePath.split("/")[0] || "Unknown Directory");
 
     // Convert files into a structured array
     const fileList = Array.from(files).map((file) => ({
@@ -31,9 +29,45 @@ const DirectorySelector: React.FC = () => {
       fileObject: file,
     }));
 
+    let excludedDirs = new Set([".git"]);
     try {
       await Promise.all(
         fileList.map((file) => {
+          if (file.name === ".gitignore") {
+            return new Promise<void>((resolve, reject) => {
+              const fileReader = new FileReader();
+              fileReader.onload = (event) => {
+                if (event.target?.result) {
+                  console.log("Reading .gitignore file:", file.name);
+                  excludedDirs = readGitignore(event.target.result as string, excludedDirs);
+                  resolve();
+                } else {
+                  reject(`Error reading .gitignore file: ${file.name}`);
+                }
+              };
+              fileReader.onerror = () => {
+                reject(`Error reading .gitignore file: ${file.name}`);
+              };
+              fileReader.readAsText(file.fileObject);
+            });
+          }
+          return Promise.resolve();
+        })
+      );
+
+      console.log("Excluded directories:", excludedDirs);
+
+      const filteredFiles = fileList.filter((file) => {
+        const excludeCheck = file.path.split("/").some((dir) => excludedDirs.has(dir));
+        return !excludeCheck && (file.name.endsWith(".js") || file.name.endsWith(".jsx") || file.name.endsWith(".ts") || file.name.endsWith(".tsx"));
+      });
+
+      filteredFiles.forEach((file) => {
+        console.log(file.path);
+      });
+
+      await Promise.all(
+        filteredFiles.map((file) => {
           return new Promise<void>((resolve, reject) => {
             if (file.name.endsWith(".js") || file.name.endsWith(".jsx") || file.name.endsWith(".ts") || file.name.endsWith(".tsx") || file.name === ".gitignore") {
               const fileReader = new FileReader();
@@ -52,34 +86,12 @@ const DirectorySelector: React.FC = () => {
               };
 
               fileReader.readAsText(file.fileObject);
-
-              if (file.name === ".gitignore") {
-                fileReader.onload = (event) => {
-                  if (event.target?.result) {
-                    readGitignore(event.target.result as string);
-                  }
-                };
-              }
             } else {
               resolve(); // No reading needed for non-JS/TS files
             }
           });
         })
       );
-
-      const filteredFiles = fileList.filter((file) => {
-        var excludeCheck = file.path.split("/").filter(function(dir) {
-          console.log(excludedDirs)
-          console.log(file.path)
-          console.log("tf?", excludedDirs.has(dir))
-          return excludedDirs.has(dir);
-        });
-        return excludeCheck.length === 0 && (file.name.endsWith(".js") || file.name.endsWith(".jsx") || file.name.endsWith(".ts") || file.name.endsWith(".tsx"));
-      });
-
-      filteredFiles.forEach((file) => {
-        console.log(file.path);
-      });
 
       setIsUploading(true);
       const response = await fetch("http://localhost:5001/api/dirAnalysis", {
@@ -96,6 +108,7 @@ const DirectorySelector: React.FC = () => {
 
       console.log("Directory analysis response:", responseData.files);
       setDirAnalysis(responseData.files);
+      setDirectoryPath(files[0]?.webkitRelativePath.split("/")[0] || "Unknown Directory");
 
       console.log("Directory analysis completed!");
     } catch (error) {
@@ -105,27 +118,27 @@ const DirectorySelector: React.FC = () => {
     }
   };
 
-  const readGitignore = (content: string) => {
-    
-
+  function readGitignore(content: string, prevExcludedDirs: Set<string>): Set<string>  {
     const lines = content.split("\n");
-
+    const newExcludedDirs = new Set(prevExcludedDirs);
     lines.forEach((line) => {
       let trimmedLine = line.trim();
       if (trimmedLine && !trimmedLine.startsWith("#")) {
         if (trimmedLine.startsWith("/")) {
           trimmedLine = trimmedLine.slice(1).trim();
         }
-        if (!excludedDirs.has(trimmedLine)) {
-          excludedDirs.add(trimmedLine);
-        }
+        console.log("Adding to excluded directories:", trimmedLine);
+        newExcludedDirs.add(trimmedLine);
       }
     });
+    console.log("Updated excluded directories:", newExcludedDirs);
+    return newExcludedDirs;
+
   };
 
   const handleGoToVisualizer = () => {
     if (directoryPath) {
-      navigate("/visualizer", {state: { files: dirAnalysis }});
+      navigate("/visualizer", { state: { files: dirAnalysis } });
     } else {
       setError("Please select a directory first.");
     }
