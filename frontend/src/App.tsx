@@ -1,10 +1,15 @@
-import { RouterProvider, createBrowserRouter, Navigate } from "react-router-dom";
+import {
+  RouterProvider,
+  createBrowserRouter,
+  Navigate,
+} from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import LandingPage from "./components/LandingPage";
 import LoginPage from "./components/LoginPage";
 import Dashboard from "./components/Dashboard";
 import Visualizer from "./components/Visualizer"; // Import the Visualizer page
 import "./App.css";
+import FunctionMap from "./components/functionMap";
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -49,7 +54,19 @@ const App: React.FC = () => {
     },
     {
       path: "/dashboard",
-      element: isAuthenticated ? <Dashboard /> : <Navigate to="/login" replace />,
+      element: isAuthenticated ? (
+        <Dashboard />
+      ) : (
+        <Navigate to="/login" replace />
+      ),
+    },
+    {
+      path: "/functionMapping",
+      element: isAuthenticated ? (
+        <FunctionMap />
+      ) : (
+        <Navigate to="/login" replace />
+      ),
     },
     {
       path: "/visualizer",

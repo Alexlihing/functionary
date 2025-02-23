@@ -1,21 +1,23 @@
-require("dotenv").config();
 const express = require("express");
 const session = require("express-session");
 const passport = require("./auth/googleAuth.js"); // Ensure your auth setup is correct
 const cors = require("cors");
 const { exec } = require("child_process");
-const { dirAnalysis } = require("./utils/dirAnalysis.js");
+const RAG = require("../backend/routes/pinecone");
+require("dotenv").config();
 
 const app = express();
 app.use(express.json()); // ✅ Parse JSON requests
 
 // ✅ Enable CORS for frontend communication
-app.use(cors({
-  origin: "http://localhost:5173",
-  credentials: true,
-  methods: ["GET"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-}));
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+    methods: ["GET"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 // ✅ Middleware for sessions
 app.use(
@@ -26,13 +28,17 @@ app.use(
     cookie: { secure: false, httpOnly: true, sameSite: "lax" },
   })
 );
+app.use("/RAGservice", RAG);
 
 // ✅ Initialize Passport for authentication
 app.use(passport.initialize());
 app.use(passport.session());
 
 // ✅ Google OAuth Routes
-app.get("/api/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+app.get(
+  "/api/auth/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
 
 app.get(
   "/auth/google/callback",
@@ -78,8 +84,7 @@ app.get("/api/select-directory", ensureAuthenticated, (req, res) => {
       'powershell -command "Add-Type -AssemblyName System.Windows.Forms; $f=New-Object System.Windows.Forms.FolderBrowserDialog; $f.ShowDialog(); $f.SelectedPath"';
   } else {
     // ✅ macOS: Use AppleScript's Folder Picker
-    command =
-      `osascript -e 'tell application "System Events" to return POSIX path of (choose folder as alias)'`;
+    command = `osascript -e 'tell application "System Events" to return POSIX path of (choose folder as alias)'`;
   }
 
   exec(command, (error, stdout, stderr) => {
@@ -97,11 +102,13 @@ app.get("/api/select-directory", ensureAuthenticated, (req, res) => {
 app.post("/api/dirAnalysis", (req, res) => {
   const files = req.body.files;
   console.log("📁 Directory Path for Analysis:", files);
-  
+
   dirAnalysis(files);
 
   res.json({ message: `Directory ${files} analyzed successfully!` });
 });
+
+console.log(process.env.OPENAI_API_KEY);
 
 // ✅ Start backend
 const PORT = process.env.PORT || 5001;
