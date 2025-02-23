@@ -1,8 +1,7 @@
 import { parse } from "@babel/parser";
 import generate from "@babel/generator"; // Fixed import
-import { dirAnalyzedRepo } from "../repo/dirAnalyzedRepo.js";
 
-const fileStrings = [];
+let fileStrings = [];
 let functionDefs = [];
 let functionCalls = [];
 
@@ -50,8 +49,7 @@ const parseJsFile = (file) => {
     fileStrings.push(new FileString(file.path, file.content, functionDefs, functionCalls));
     functionDefs = [];
     functionCalls = [];
-    console.log("File strings: ", fileStrings);
-    dirAnalyzedRepo(fileStrings);
+    //console.log("File strings: ", fileStrings);
   } catch (error) {
     console.error("Error parsing JS file: ", file.path, "\n", error);
   }
@@ -160,7 +158,9 @@ export function dirAnalysis(files) {
   files.forEach((file) => {
     parseJsFile(file);
   });
+  fileStrings = [];
   //console.log("Function Definitions:", functionDefs);
   //console.log("Function Calls:", functionCalls);
   //console.log("File Strings:", fileStrings);
+  return fileStrings;
 }

@@ -104,9 +104,12 @@ app.post("/api/dirAnalysis", (req, res) => {
   const files = req.body.files;
   console.log("📁 Directory Path for Analysis:", files);
 
-  dirAnalysis(files);
+  const fileStrings = dirAnalysis(files);
 
-  res.json({ message: `Directory ${files} analyzed successfully!` });
+  if (!fileStrings) {
+    return res.status(400).json({ error: "No files found for analysis" });
+  }
+  res.json({ message: `Directory ${files} analyzed successfully!`, files: fileStrings });
 });
 
 console.log(process.env.OPENAI_API_KEY);

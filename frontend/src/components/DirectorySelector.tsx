@@ -9,6 +9,7 @@ const DirectorySelector: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const navigate = useNavigate();
+  const [dirAnalysis, setDirAnalysis] = useState<any>(null);
 
   const handleDirectorySelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -81,9 +82,14 @@ const DirectorySelector: React.FC = () => {
         body: JSON.stringify({ directory: directoryPath, files: fileList }),
       });
 
+      const responseData = await response.json();
+
       if (!response.ok) {
         throw new Error("Failed to analyze directory.");
       }
+
+      console.log("Directory analysis response:", responseData.files);
+      setDirAnalysis(responseData.files);
 
       console.log("Directory analysis completed!");
     } catch (error) {
@@ -111,7 +117,7 @@ const DirectorySelector: React.FC = () => {
 
   const handleGoToVisualizer = () => {
     if (directoryPath) {
-      navigate("/visualizer");
+      navigate("/visualizer", {state: { files: dirAnalysis }});
     } else {
       setError("Please select a directory first.");
     }

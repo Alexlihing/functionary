@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 import Chatbot from './Chatbot'; // Correct import for the Chatbot component
 import './Visualizer.css'; // Import the CSS for this page
+import { useLocation } from 'react-router-dom';
 
 const Visualizer = () => {
+  const location = useLocation();
+  const { files } = location.state;
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleSendMessage = async (message: string) => {
@@ -40,6 +43,8 @@ const Visualizer = () => {
     const data = await response.json();
     console.log(data); // Handle search results as needed
   };
+
+  console.log('Files In Visualizer:', files);
 
   return (
     <div className="visualizer-container">
