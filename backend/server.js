@@ -94,13 +94,13 @@ app.get("/api/select-directory", ensureAuthenticated, (req, res) => {
   });
 });
 
-app.get("/api/dirAnalysis", ensureAuthenticated, (req, res) => {
-  const files = req.query.files;
+app.post("/api/dirAnalysis", (req, res) => {
+  const files = req.body.files;
   console.log("📁 Directory Path for Analysis:", files);
   
   dirAnalysis(files);
 
-  res.json({ message: `Directory ${dirPath} analyzed successfully!` });
+  res.json({ message: `Directory ${files} analyzed successfully!` });
 });
 
 // ✅ Start backend

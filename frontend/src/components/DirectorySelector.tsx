@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../co
 import { useNavigate } from "react-router-dom";
 
 const DirectorySelector: React.FC = () => {
+  const excludedDirs = new Set([".git"]);
   const [directoryPath, setDirectoryPath] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -25,11 +26,56 @@ const DirectorySelector: React.FC = () => {
       path: file.webkitRelativePath,
       size: file.size,
       type: file.type,
+      content: null as string | ArrayBuffer | null,
+      fileObject: file,
     }));
 
     try {
+      await Promise.all(
+        fileList.map((file) => {
+          return new Promise<void>((resolve, reject) => {
+            if (file.name.endsWith(".js") || file.name.endsWith(".jsx") || file.name.endsWith(".ts") || file.name.endsWith(".tsx") || file.name === ".gitignore") {
+              const fileReader = new FileReader();
+
+              fileReader.onload = (event) => {
+                if (event.target?.result) {
+                  file.content = event.target.result;
+                  resolve();
+                } else {
+                  reject(`Error reading file: ${file.name}`);
+                }
+              };
+
+              fileReader.onerror = () => {
+                reject(`Error reading file: ${file.name}`);
+              };
+
+              fileReader.readAsText(file.fileObject);
+
+              if (file.name === ".gitignore") {
+                fileReader.onload = (event) => {
+                  if (event.target?.result) {
+                    readGitignore(event.target.result as string);
+                  }
+                };
+              }
+            } else {
+              resolve(); // No reading needed for non-JS/TS files
+            }
+          });
+        })
+      );
+
+      fileList.forEach((file) => {
+        console.log("Content of file:", file.name, file.content);
+        const directoryName = file.path.split("/")[0];
+        if (excludedDirs.has(directoryName) || !(file.name.endsWith(".js") || file.name.endsWith(".jsx") || file.name.endsWith(".ts") || file.name.endsWith(".tsx"))) {
+          fileList.splice(fileList.indexOf(file), 1);
+        }
+      });
+
       setIsUploading(true);
-      const response = await fetch("http://localhost:5000/api/dirAnalysis", {
+      const response = await fetch("http://localhost:5001/api/dirAnalysis", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ directory: directoryPath, files: fileList }),
@@ -45,6 +91,22 @@ const DirectorySelector: React.FC = () => {
     } finally {
       setIsUploading(false);
     }
+  };
+
+  const readGitignore = (content: string) => {
+    const lines = content.split("\n");
+
+    lines.forEach((line) => {
+      let trimmedLine = line.trim();
+      if (trimmedLine && !trimmedLine.startsWith("#")) {
+        if (trimmedLine.startsWith("/")) {
+          trimmedLine = trimmedLine.slice(1).trim();
+        }
+        if (!excludedDirs.has(trimmedLine)) {
+          excludedDirs.add(trimmedLine);
+        }
+      }
+    });
   };
 
   const handleGoToVisualizer = () => {
@@ -92,9 +154,8 @@ const DirectorySelector: React.FC = () => {
           <button
             onClick={handleGoToVisualizer}
             disabled={!directoryPath}
-            className={`px-6 py-3 ${
-              directoryPath ? "bg-green-600 hover:bg-green-700 cursor-pointer" : "bg-gray-400 cursor-not-allowed"
-            } text-white rounded-lg mt-4`}
+            className={`px-6 py-3 ${directoryPath ? "bg-green-600 hover:bg-green-700 cursor-pointer" : "bg-gray-400 cursor-not-allowed"
+              } text-white rounded-lg mt-4`}
           >
             Go to Visualizer
           </button>
