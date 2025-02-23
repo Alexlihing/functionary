@@ -108,15 +108,17 @@
 
 .chatbot-panel .chatbot-messages {
   flex: 1;
-  overflow-y: auto;
-  max-height: 300px;
+  overflow-y: auto; /* Ensures content scrolls vertically */
+  max-height: 100px; /* Keeps the height fixed */
+  max-width: 100px;
   padding: 0.5rem;
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   margin-bottom: 1rem;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
-  width: "fixed";
+  width: 100%; /* Ensures the width stays fixed */
+  box-sizing: border-box; /* Prevents overflow from affecting layout */
 }
 
 .chatbot-panel .chatbot-messages::-webkit-scrollbar {
