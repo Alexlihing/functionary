@@ -62,12 +62,13 @@ const CodeDiagram = ({ fileStrings, explain }: CodeDiagramProps) => {
     const numColumns = Math.ceil(Math.sqrt(fileStrings.length));
     const parentWidth = 400;
     const parentHeight = 400;
-    const gap = 300; // Increased spacing between nodes
+    const gap = 300;
 
     // File nodes
     fileStrings.forEach((file, fileIndex) => {
       const fileId = `file-${file.filePath.replace(/[^a-zA-Z0-9]/g, "-")}`;
       const color = fileColors[fileIndex % fileColors.length];
+      const fileName = file.filePath.split("/").pop() || file.filePath;
 
       // Calculate grid position
       const columnIndex = fileIndex % numColumns;
@@ -75,33 +76,51 @@ const CodeDiagram = ({ fileStrings, explain }: CodeDiagramProps) => {
       const x = columnIndex * (parentWidth + gap);
       const y = rowIndex * (parentHeight + gap);
 
+      // Main file node
       nodes.push({
         id: fileId,
-        type: "group",
         position: { x, y },
         data: {
           label: (
-            <div>
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                zIndex: 2,
+                textAlign: "center",
+              }}
+            >
               <div
                 style={{
-                  marginBottom: "12px",
-                  fontSize: "28px",
-                  fontWeight: 400, // No bolding
-                  letterSpacing: "0.5px",
-                  textShadow: "2px 2px 6px rgba(0,0,0,0.5)",
+                  fontSize: "32px",
+                  fontWeight: 600,
+                  color: color.border,
+                  textShadow:
+                    "2px 2px 8px rgba(0,0,0,0.7), -1px -1px 4px rgba(255,255,255,0.5)",
+                  padding: "12px 24px",
+                  backgroundColor: "rgba(255, 255, 255, 0.15)",
+                  borderRadius: "50px",
+                  backdropFilter: "blur(4px)",
+                  border: `2px solid ${hexToRgba(color.border, 0.3)}`,
                 }}
               >
-                {file.filePath.split("/").pop()}
+                {fileName}
+                <div
+                  style={{
+                    fontSize: "16px",
+                    color: hexToRgba(color.border, 0.9),
+                    marginTop: "8px",
+                    textShadow: "1px 1px 2px rgba(0,0,0,0.2)",
+                  }}
+                >
+                  {file.FunctionDef.length} Functions
+                </div>
               </div>
-              <small
-                style={{ color: "#343a40", fontSize: "16px", opacity: 0.85 }}
-              >
-                {file.FunctionDef.length} Functions
-              </small>
             </div>
           ),
         },
-        className: "file-node",
         style: {
           width: parentWidth,
           height: parentHeight,
@@ -110,52 +129,65 @@ const CodeDiagram = ({ fileStrings, explain }: CodeDiagramProps) => {
             0.3
           )} 0%, ${hexToRgba(color.bgEnd, 0.3)} 100%)`,
           border: `6px solid ${color.border}`,
+          borderRadius: "50%",
           "--border-color": color.border,
         },
+        className: "file-node",
       });
 
       // Function nodes
       file.FunctionDef.forEach((func, funcIndex) => {
         const funcId = `func-${fileId}-${func.name}`;
+        const labelId = `label-${funcId}`;
         functionLocations[func.name] = funcId;
-        const angle =
-          (funcIndex / Math.max(file.FunctionDef.length, 1)) * 2 * Math.PI;
-        const radius = 130;
-        const centerX = parentWidth / 2;
-        const centerY = parentHeight / 2;
 
+        // Position functions around the file node
+        const angle =
+          (funcIndex / Math.max(file.FunctionDef.length, 1)) * Math.PI * 2;
+        const radius = 200;
+        const funcX = x + parentWidth / 2 + Math.cos(angle) * radius - 70;
+        const funcY = y + parentHeight / 2 + Math.sin(angle) * radius - 70;
+        const labelY = funcY - 30; // Position label 30px above the function node
+
+        // Function node
         nodes.push({
           id: funcId,
+          position: { x: funcX, y: funcY },
           data: {
             label: (
               <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  cursor: "pointer",
+                }}
                 data-tooltip-id="function-tooltip"
                 data-tooltip-content={func.code}
-                style={{ cursor: "pointer" }}
               >
                 <div
                   style={{
-                    fontWeight: 400, // No bolding
-                    marginBottom: "6px",
+                    fontWeight: 400,
+                    marginBottom: "4px",
                     fontSize: "20px",
                     textShadow: "1px 1px 3px rgba(0,0,0,0.5)",
                   }}
                 >
                   {func.name}
                 </div>
-                <small style={{ color: "#495057", fontSize: "13px" }}>
+                <small
+                  style={{
+                    color: "#495057",
+                    fontSize: "12px",
+                    marginBottom: "4px",
+                  }}
+                >
                   ({func.params.join(", ")})
                 </small>
               </div>
             ),
             funcName: func.name,
           },
-          position: {
-            x: centerX + radius * Math.cos(angle) - 70, // Offset by half node width
-            y: centerY + radius * Math.sin(angle) - 70, // Offset by half node height
-          },
-          parentNode: fileId,
-          extent: "parent",
           className: "func-node",
           style: {
             width: 140,
@@ -165,8 +197,39 @@ const CodeDiagram = ({ fileStrings, explain }: CodeDiagramProps) => {
               0.5
             )} 100%)`,
             border: `3px solid ${color.border}`,
+            borderRadius: "50%",
             "--border-color": color.border,
           },
+        });
+
+        // File name label node (outside the circle)
+        nodes.push({
+          id: labelId,
+          position: { x: funcX, y: labelY },
+          data: {
+            label: (
+              <div
+                style={{
+                  fontSize: "13px",
+                  fontWeight: 500,
+                  color: color.border,
+                  textShadow: "1px 1px 2px rgba(0,0,0,0.4)",
+                  textAlign: "center",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {fileName}
+              </div>
+            ),
+          },
+          style: {
+            width: "auto",
+            height: "auto",
+            background: "transparent",
+            border: "none",
+            padding: 0,
+          },
+          draggable: false, // Prevent dragging the label independently
         });
       });
     });
@@ -203,8 +266,8 @@ const CodeDiagram = ({ fileStrings, explain }: CodeDiagramProps) => {
           labelStyle: {
             fill: "#212529",
             fontSize: 14,
-            fontWeight: 400, // No bolding
-            fontFamily: "Poppins, sans-serif",
+            fontWeight: 400,
+            fontFamily: "Poppins, sans-serif", // Fixed: Single string with comma
           },
           labelBgStyle: {
             fill: hexToRgba(color.bgStart, 0.7),
@@ -259,7 +322,7 @@ const CodeDiagram = ({ fileStrings, explain }: CodeDiagramProps) => {
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-family: "Poppins", sans-serif;
+            font-family: "Poppins, sans-serif";
             box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             text-align: center;
@@ -320,7 +383,7 @@ const CodeDiagram = ({ fileStrings, explain }: CodeDiagramProps) => {
           padding: "15px",
           maxWidth: "500px",
           whiteSpace: "pre-wrap",
-          fontFamily: "Fira Code, monospace",
+          fontFamily: "Fira Code, monospace", // Fixed: Single string with comma
           fontSize: "14px",
           boxShadow: "0 6px 16px rgba(0,0,0,0.25)",
           backdropFilter: "blur(4px)",
