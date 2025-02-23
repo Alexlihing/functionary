@@ -578,7 +578,7 @@ async function generalizedExplain(query) {
           Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
           "Content-Type": "application/json",
         },
-        timeout: 30000, // 30 seconds timeout
+        timeout: 60000, // 30 seconds timeout
       }
     );
 

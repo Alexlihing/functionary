@@ -589,6 +589,9 @@ const FunctionMap = () => {
 
       const data = await response.json();
       console.log(data);
+
+      return data;
+      console.log(data);
     } catch (error) {
       console.log(error.message);
     }

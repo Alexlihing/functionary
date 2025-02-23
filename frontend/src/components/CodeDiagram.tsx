@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import ReactFlow, {
   Controls,
   Background,
@@ -33,7 +33,7 @@ type FunctionCall = {
 
 type CodeDiagramProps = {
   fileStrings: FileString[];
-  explain: (funcName: string) => void;
+  explain: (funcName: string) => Promise<{ explanation: string }>;
 };
 
 // Color palette
@@ -52,7 +52,165 @@ const hexToRgba = (hex: string, alpha: number) => {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
+// Updated Explanation Panel Component
+const ExplanationPanel = ({
+  explanation,
+  onClose,
+  color,
+  isLoading,
+}: {
+  explanation?: string;
+  onClose: () => void;
+  color: string;
+  isLoading: boolean;
+}) => (
+  <div
+    style={{
+      position: "fixed",
+      top: "20px",
+      right: "20px",
+      bottom: "20px",
+      width: "400px",
+      background: `linear-gradient(145deg, ${hexToRgba(
+        color,
+        0.1
+      )} 0%, ${hexToRgba(color, 0.05)} 100%)`,
+      borderRadius: "20px",
+      padding: "30px",
+      boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
+      backdropFilter: "blur(12px)",
+      border: `1px solid ${hexToRgba(color, 0.2)}`,
+      transform: "translateX(0)",
+      transition: "transform 0.3s ease-in-out",
+      zIndex: 1001,
+    }}
+  >
+    <button
+      onClick={onClose}
+      style={{
+        position: "absolute",
+        top: "20px",
+        right: "20px",
+        background: "none",
+        border: "none",
+        color: "#ffffff",
+        fontSize: "24px",
+        cursor: "pointer",
+      }}
+    >
+      ×
+    </button>
+    <div
+      style={{
+        fontFamily: "'Fira Code', monospace",
+        fontSize: "14px",
+        color: "#ffffff",
+        whiteSpace: "pre-wrap",
+        overflowY: "auto",
+        height: "calc(100% - 40px)",
+        position: "relative",
+      }}
+    >
+      {isLoading ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
+          <div
+            style={{
+              border: `4px solid ${hexToRgba(color, 0.1)}`,
+              borderLeftColor: "#ffffff",
+              borderRadius: "50%",
+              width: "40px",
+              height: "40px",
+              animation: "spin 1s linear infinite",
+            }}
+          />
+        </div>
+      ) : (
+        explanation && (
+          <>
+            <div
+              style={{
+                marginBottom: "20px",
+                fontWeight: 600,
+                color: "#ffffff",
+              }}
+            >
+              FUNCTION CODE
+            </div>
+            <pre
+              style={{
+                background: hexToRgba(color, 0.1),
+                padding: "15px",
+                borderRadius: "8px",
+                whiteSpace: "pre-wrap",
+                lineHeight: 1.5,
+                color: "#ffffff",
+              }}
+            >
+              {explanation.split("// Explanation")[0].trim()}
+            </pre>
+            <div
+              style={{ margin: "20px 0", fontWeight: 600, color: "#ffffff" }}
+            >
+              EXPLANATION
+            </div>
+            {explanation
+              .split("// Explanation")[1]
+              ?.split("\n")
+              .filter((line) => line.trim())
+              .map((line, index) => (
+                <div
+                  key={index}
+                  style={{
+                    padding: "8px 0",
+                    borderBottom: "1px solid rgba(255,255,255,0.2)",
+                    display: "flex",
+                    gap: "10px",
+                    alignItems: "flex-start",
+                  }}
+                >
+                  <div
+                    style={{
+                      flexShrink: 0,
+                      width: "24px",
+                      height: "24px",
+                      background: hexToRgba(color, 0.1),
+                      borderRadius: "4px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      color: "#ffffff",
+                    }}
+                  >
+                    {index + 1}
+                  </div>
+                  <div style={{ flexGrow: 1, color: "#ffffff" }}>
+                    {line.replace(/^\d+\.\s*/, "").trim()}
+                  </div>
+                </div>
+              ))}
+          </>
+        )
+      )}
+    </div>
+  </div>
+);
+
 const CodeDiagram = ({ fileStrings, explain }: CodeDiagramProps) => {
+  const [selectedExplanation, setSelectedExplanation] = useState<{
+    content: string;
+    color: string;
+  } | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
   const { nodes, edges } = useMemo(() => {
     const nodes: Node[] = [];
     const edges: Edge[] = [];
@@ -147,7 +305,7 @@ const CodeDiagram = ({ fileStrings, explain }: CodeDiagramProps) => {
         const radius = 200;
         const funcX = x + parentWidth / 2 + Math.cos(angle) * radius - 70;
         const funcY = y + parentHeight / 2 + Math.sin(angle) * radius - 70;
-        const labelY = funcY - 30; // Position label 30px above the function node
+        const labelY = funcY - 30;
 
         // Function node
         nodes.push({
@@ -229,12 +387,12 @@ const CodeDiagram = ({ fileStrings, explain }: CodeDiagramProps) => {
             border: "none",
             padding: 0,
           },
-          draggable: false, // Prevent dragging the label independently
+          draggable: false,
         });
       });
     });
 
-    // Edges
+    // Edges with reversed direction
     fileStrings.forEach((file, fileIndex) => {
       const fileId = `file-${file.filePath.replace(/[^a-zA-Z0-9]/g, "-")}`;
       const color = fileColors[fileIndex % fileColors.length];
@@ -242,10 +400,10 @@ const CodeDiagram = ({ fileStrings, explain }: CodeDiagramProps) => {
 
       file.FunctionCall.forEach((call) => {
         if (!functionLocations[call.name]) return;
-        const targetId = functionLocations[call.name];
-        const sourceId = call.parentFunc
+        const targetId = call.parentFunc
           ? `func-${fileId}-${call.parentFunc}`
           : fileId;
+        const sourceId = functionLocations[call.name];
 
         if (
           !nodes.some((n) => n.id === sourceId) ||
@@ -255,8 +413,8 @@ const CodeDiagram = ({ fileStrings, explain }: CodeDiagramProps) => {
 
         edges.push({
           id: `edge-${sourceId}-${targetId}`,
-          source: sourceId,
-          target: targetId,
+          source: sourceId, // Reversed: Called function is now source
+          target: targetId, // Reversed: Caller is now target
           type: "bezier",
           animated: !!call.parentFunc,
           className: `custom-edge file-color-${colorIndex}`,
@@ -267,7 +425,7 @@ const CodeDiagram = ({ fileStrings, explain }: CodeDiagramProps) => {
             fill: "#212529",
             fontSize: 14,
             fontWeight: 400,
-            fontFamily: "Poppins, sans-serif", // Fixed: Single string with comma
+            fontFamily: "Poppins, sans-serif",
           },
           labelBgStyle: {
             fill: hexToRgba(color.bgStart, 0.7),
@@ -282,8 +440,35 @@ const CodeDiagram = ({ fileStrings, explain }: CodeDiagramProps) => {
     return { nodes, edges };
   }, [fileStrings]);
 
-  const handleNodeClick = (event: React.MouseEvent, node: Node) => {
-    if (node.data?.funcName) explain(node.data.funcName);
+  const handleNodeClick = async (event: React.MouseEvent, node: Node) => {
+    if (node.data?.funcName) {
+      try {
+        setIsLoading(true);
+        let funcColor = fileColors[0].border;
+        const explanationFromAPI = await explain(node.data.funcName);
+
+        fileStrings.forEach((file, fileIndex) => {
+          file.FunctionDef.forEach((func) => {
+            if (func.name === node.data.funcName) {
+              funcColor = fileColors[fileIndex % fileColors.length].border;
+            }
+          });
+        });
+
+        setSelectedExplanation({
+          content: explanationFromAPI.explanation,
+          color: funcColor,
+        });
+      } catch (error) {
+        console.error("Error fetching explanation:", error);
+        setSelectedExplanation({
+          content: "Failed to load explanation",
+          color: fileColors[0].border,
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    }
   };
 
   // Generate glow styles for each file color
@@ -316,6 +501,14 @@ const CodeDiagram = ({ fileStrings, explain }: CodeDiagramProps) => {
       <Global
         styles={css`
           ${glowStyles}
+          @keyframes spin {
+            0% {
+              transform: rotate(0deg);
+            }
+            100% {
+              transform: rotate(360deg);
+            }
+          }
           .file-node,
           .func-node {
             display: flex;
@@ -372,6 +565,17 @@ const CodeDiagram = ({ fileStrings, explain }: CodeDiagramProps) => {
           }}
         />
       </ReactFlow>
+      {(isLoading || selectedExplanation) && (
+        <ExplanationPanel
+          explanation={selectedExplanation?.content}
+          onClose={() => {
+            setSelectedExplanation(null);
+            setIsLoading(false);
+          }}
+          color={selectedExplanation?.color || fileColors[0].border}
+          isLoading={isLoading}
+        />
+      )}
       <Tooltip
         id="function-tooltip"
         place="top"
@@ -383,7 +587,7 @@ const CodeDiagram = ({ fileStrings, explain }: CodeDiagramProps) => {
           padding: "15px",
           maxWidth: "500px",
           whiteSpace: "pre-wrap",
-          fontFamily: "Fira Code, monospace", // Fixed: Single string with comma
+          fontFamily: "Fira Code, monospace",
           fontSize: "14px",
           boxShadow: "0 6px 16px rgba(0,0,0,0.25)",
           backdropFilter: "blur(4px)",
