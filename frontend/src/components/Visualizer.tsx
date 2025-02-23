@@ -1,10 +1,18 @@
 import React from 'react';
-import Chatbot from './Chatbot'; // Import the Chatbot component
+import Chatbot from './Chatbot'; // Correct import for the Chatbot component
 import './Visualizer.css'; // Import the CSS for this page
 
 const Visualizer = () => {
   const handleSendMessage = async (message: string) => {
-    // Replace with your actual backend API call for the chatbot
+
+
+
+
+
+    //TODO: Replace with actual backend API call for the chatbot************
+
+
+
     const response = await fetch('/api/chatbot', {
       method: 'POST',
       headers: {
@@ -26,15 +34,20 @@ const Visualizer = () => {
       {/* Main Content Area */}
       <div className="main-content">
         {/* Placeholder for the main content */}
-        <h1>Code Visualizer</h1>
-        <p>This is where the main content will go.</p>
+        <h1>Insert Code Visualizer Here Somehow</h1>
       </div>
 
       {/* Chatbot Panel */}
       <div className="chatbot-panel">
+        {/* Header/Title */}
+        <div className="chatbot-header">
+            <h2>FunctionaryAI</h2>
+        </div>
+  
         {/* Pass the handleSendMessage function to the Chatbot component */}
         <Chatbot onSendMessage={handleSendMessage} />
       </div>
+      
     </div>
   );
 };

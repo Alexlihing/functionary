@@ -26,15 +26,20 @@ const Chatbot: React.FC<ChatbotProps> = ({ onSendMessage }) => {
 
   return (
     <div className="chatbot-container">
+      
+
+      {/* Chatbot Messages */}
       <div className="chatbot-messages">
         {response && <div className="chatbot-response">{response}</div>}
       </div>
+
+      {/* Chatbot Input */}
       <div className="chatbot-input">
         <input
           type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="Ask me anything..."
+          placeholder="Ask me anything about your code..."
           disabled={isLoading}
         />
         <button onClick={handleSendMessage} disabled={isLoading}>
@@ -45,4 +50,4 @@ const Chatbot: React.FC<ChatbotProps> = ({ onSendMessage }) => {
   );
 };
 
-export default Chatbot; 
+export default Chatbot;
