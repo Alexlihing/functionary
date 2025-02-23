@@ -9,6 +9,7 @@ const {
   FileString,
   FunctionDef,
   FunctionCall,
+  generalizedExplain,
 } = require("../utils/RAGservice");
 
 router.post("/embedCode", async (req, res) => {
@@ -106,4 +107,17 @@ router.post("/explain", async (req, res) => {
   }
 });
 
+router.post("/GenExplain", async (req, res) => {
+  const { query } = req.body;
+
+  try {
+    const response = await generalizedExplain(query);
+    res.status(200).json({ completion: response });
+  } catch (error) {
+    console.error("Explanation failed:", error.message);
+    res
+      .status(500)
+      .json({ error: "Explanation failed", details: error.message });
+  }
+});
 module.exports = router;
